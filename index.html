@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dada Arusha Wrapped</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0a1628 0%, #12243e 40%, #0d1f35 100%);
+      min-height: 100vh;
+      color: #fff;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+    ::-webkit-scrollbar-thumb { background: #1D9E75; border-radius: 3px; }
+
+    /* Step indicator */
+    .step-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.3s ease; }
+    .step-dot.active { background: #1D9E75; transform: scale(1.3); box-shadow: 0 0 0 4px rgba(29,158,117,0.25); }
+    .step-dot.done { background: #1D9E75; }
+
+    /* Form inputs */
+    .form-input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      outline: none;
+    }
+    .form-input::placeholder { color: rgba(255,255,255,0.4); }
+    .form-input:focus { border-color: #1D9E75; box-shadow: 0 0 0 3px rgba(29,158,117,0.2); }
+
+    /* Radio card */
+    .radio-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 18px;
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: rgba(255,255,255,0.04);
+    }
+    .radio-card:hover { border-color: #1D9E75; background: rgba(29,158,117,0.08); }
+    .radio-card.selected { border-color: #1D9E75; background: rgba(29,158,117,0.15); box-shadow: 0 0 0 1px #1D9E75; }
+    .radio-dot {
+      width: 20px; height: 20px; min-width: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+      transition: border-color 0.2s;
+    }
+    .radio-card.selected .radio-dot { border-color: #1D9E75; }
+    .radio-dot-inner { width: 10px; height: 10px; border-radius: 50%; background: #1D9E75; display: none; }
+    .radio-card.selected .radio-dot-inner { display: block; }
+
+    /* Buttons */
+    .btn-primary {
+      background: #1D9E75;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 16px 32px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .btn-primary:hover { background: #168a64; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(29,158,117,0.4); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { background: rgba(29,158,117,0.4); cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 14px 28px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); }
+
+    .btn-ghost {
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.07); }
+
+    /* Photo upload */
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(255,255,255,0.03);
+    }
+    .upload-zone:hover { border-color: #1D9E75; background: rgba(29,158,117,0.07); }
+
+    /* Magazine cover canvas */
+    #magazine-cover {
+      position: relative;
+      width: 360px;
+      height: 540px;
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+      border-radius: 4px;
+    }
+
+    /* High-res export canvas */
+    #magazine-cover-export {
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+      width: 1080px;
+      height: 1620px;
+      overflow: hidden;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Copied feedback */
+    .copy-feedback {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1D9E75;
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .copy-feedback.show { transform: translateX(-50%) translateY(0); }
+
+    /* Section label */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #1D9E75;
+      margin-bottom: 10px;
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.45s ease both; }
+
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(29,158,117,0.5); }
+      100% { box-shadow: 0 0 0 16px rgba(29,158,117,0); }
+    }
+    .loading-pulse { animation: pulse-ring 1.2s infinite; }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 24px; height: 24px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .app-layout { flex-direction: column-reverse !important; }
+      .preview-panel { position: static !important; width: 100% !important; display: flex; flex-direction: column; align-items: center; }
+      .cover-scale-wrapper {
+        transform-origin: top center;
+      }
+    }
+    @media (max-width: 480px) {
+      body { font-size: 14px; }
+      .header-inner { padding: 14px 18px !important; }
+      .app-layout { padding: 20px 16px 0 !important; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useRef, useEffect, useCallback } = React;
+
+/* ─── Constants ──────────────────────────────────────────────────────────── */
+
+const SUPERPOWERS = [
+  { id: 'architect',    label: 'The Architect',     desc: 'Mastered the prompting formula' },
+  { id: 'communicator', label: 'The Communicator',  desc: 'Rewriting professional emails with confidence' },
+  { id: 'strategist',   label: 'The Strategist',    desc: 'Accelerating research and learning' },
+  { id: 'builder',      label: 'The Builder',       desc: 'Creating business copy that converts' },
+  { id: 'connector',    label: 'The Connector',     desc: 'Building sisterhood with other women' },
+];
+
+const LESSONS = [
+  { id: 'formula',    text: 'Role + Context + Task + Format = Excellence' },
+  { id: 'elevates',   text: 'AI doesn\'t replace me. It elevates me.' },
+  { id: 'emails',     text: 'Every email, faster. Every word, sharper.' },
+  { id: 'faster',     text: 'I learn 10x faster now.' },
+  { id: 'sisterhood', text: 'Sisterhood is my superpower.' },
+];
+
+const DEFAULT_STATE = {
+  step: 1,
+  photo: null,
+  photoUrl: null,
+  name: '',
+  superpower: '',
+  goal: '',
+  lesson: '',
+  sisters: '',
+  quote: '',
+};
+
+/* ─── Text shadow helper ─────────────────────────────────────────────────── */
+const TS = '0 4px 12px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.8)';
+
+/* ─── Magazine Cover Component ───────────────────────────────────────────── */
+function MagazineCover({ data, scale = 1, id = 'magazine-cover' }) {
+  const W = 1080 * scale;
+  const H = 1620 * scale;
+  const s = (px) => Math.round(px * scale);
+
+  const superpowerLabel = SUPERPOWERS.find(x => x.id === data.superpower)?.label || 'The Architect';
+  const lessonText = LESSONS.find(x => x.id === data.lesson)?.text || '';
+
+  return (
+    <div
+      id={id}
+      style={{
+        position: 'relative',
+        width: W,
+        height: H,
+        overflow: 'hidden',
+        fontFamily: "'Poppins', sans-serif",
+        background: '#0a1628',
+        flexShrink: 0,
+      }}
+    >
+      {/* Photo background */}
+      {data.photoUrl && (
+        <img
+          src={data.photoUrl}
+          alt="Attendee photo"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center top',
+            display: 'block',
+          }}
+          crossOrigin="anonymous"
+        />
+      )}
+
+      {/* Top gradient for readability */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0,
+        height: s(320),
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Bottom gradient */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0, left: 0, right: 0,
+        height: s(360),
+        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* TOP LEFT — Name */}
+      <div style={{
+        position: 'absolute',
+        top: s(48),
+        left: s(52),
+        maxWidth: s(560),
+      }}>
+        <div style={{
+          fontSize: s(13),
+          fontWeight: 600,
+          letterSpacing: s(3),
+          color: '#1D9E75',
+          textTransform: 'uppercase',
+          textShadow: TS,
+          marginBottom: s(4),
+        }}>DADA ARUSHA WRAPPED</div>
+        <div style={{
+          fontFamily: "'Playfair Display', serif",
+          fontSize: s(data.name.length > 10 ? 80 : 108),
+          fontWeight: 700,
+          color: '#fff',
+          lineHeight: 1.0,
+          textShadow: TS,
+          wordBreak: 'break-word',
+        }}>
+          {data.name || 'Your Name'}
+        </div>
+      </div>
+
+      {/* TOP RIGHT — AI Superpower */}
+      <div style={{
+        position: 'absolute',
+        top: s(52),
+        right: s(52),
+        textAlign: 'right',
+        maxWidth: s(360),
+      }}>
+        <div style={{
+          fontSize: s(13),
+          fontWeight: 600,
+          letterSpacing: s(4),
+          color: 'rgba(255,255,255,0.75)',
+          textTransform: 'uppercase',
+          textShadow: TS,
+          marginBottom: s(8),
+        }}>AI SUPERPOWER</div>
+        <div style={{
+          fontSize: s(28),
+          fontWeight: 700,
+          color: '#fff',
+          textShadow: TS,
+          lineHeight: 1.2,
+        }}>{superpowerLabel}</div>
+        <div style={{
+          fontSize: s(16),
+          fontWeight: 500,
+          color: 'rgba(255,255,255,0.75)',
+          textShadow: TS,
+          marginTop: s(6),
+          lineHeight: 1.4,
+        }}>{SUPERPOWERS.find(x => x.id === data.superpower)?.desc || ''}</div>
+      </div>
+
+      {/* LEFT MIDDLE — My Boldest Goal */}
+      <div style={{
+        position: 'absolute',
+        top: s(700),
+        left: s(52),
+        maxWidth: s(400),
+      }}>
+        <div style={{
+          fontSize: s(13),
+          fontWeight: 600,
+          letterSpacing: s(2.5),
+          color: 'rgba(255,255,255,0.7)',
+          textTransform: 'uppercase',
+          textShadow: TS,
+          marginBottom: s(10),
+          opacity: 0.85,
+        }}>MY BOLDEST GOAL</div>
+        <div style={{
+          fontSize: s(26),
+          fontWeight: 600,
+          color: '#fff',
+          textShadow: TS,
+          lineHeight: 1.35,
+        }}>{data.goal || 'What I will build next'}</div>
+      </div>
+
+      {/* LEFT LOWER — Sisters Connected */}
+      <div style={{
+        position: 'absolute',
+        top: s(1010),
+        left: s(52),
+      }}>
+        <div style={{
+          fontSize: s(22),
+          fontWeight: 600,
+          fontStyle: 'italic',
+          color: '#fff',
+          textShadow: TS,
+        }}>
+          {data.sisters ? `${data.sisters} sister${data.sisters > 1 ? 's' : ''} connected today` : '— sisters connected today'}
+        </div>
+      </div>
+
+      {/* RIGHT MIDDLE — Lesson */}
+      <div style={{
+        position: 'absolute',
+        top: s(700),
+        right: s(52),
+        maxWidth: s(400),
+        textAlign: 'right',
+      }}>
+        <div style={{
+          fontSize: s(13),
+          fontWeight: 600,
+          letterSpacing: s(2.5),
+          color: 'rgba(255,255,255,0.7)',
+          textTransform: 'uppercase',
+          textShadow: TS,
+          marginBottom: s(10),
+          opacity: 0.85,
+        }}>LESSON I'LL NEVER UNLEARN</div>
+        <div style={{
+          fontSize: s(24),
+          fontWeight: 600,
+          color: '#fff',
+          textShadow: TS,
+          lineHeight: 1.4,
+        }}>{lessonText || 'AI elevates me.'}</div>
+      </div>
+
+      {/* BOTTOM CENTER — Quote */}
+      {data.quote && (
+        <div style={{
+          position: 'absolute',
+          bottom: s(120),
+          left: s(52),
+          right: s(52),
+          textAlign: 'center',
+        }}>
+          <div style={{
+            fontSize: s(33),
+            fontWeight: 700,
+            color: '#fff',
+            textShadow: TS,
+            lineHeight: 1.35,
+          }}>"{data.quote}"</div>
+        </div>
+      )}
+
+      {/* VERY BOTTOM — Event info */}
+      <div style={{
+        position: 'absolute',
+        bottom: s(44),
+        left: 0, right: 0,
+        textAlign: 'center',
+      }}>
+        <div style={{
+          fontSize: s(16),
+          fontWeight: 600,
+          letterSpacing: s(2.5),
+          color: 'rgba(255,255,255,0.85)',
+          textTransform: 'uppercase',
+          textShadow: TS,
+        }}>DADA ARUSHA WRAPPED · MAY 1ST 2026 · ARUSHA, TANZANIA</div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Radio Card ──────────────────────────────────────────────────────────── */
+function RadioCard({ selected, onClick, children }) {
+  return (
+    <div
+      className={`radio-card ${selected ? 'selected' : ''}`}
+      onClick={onClick}
+      role="radio"
+      aria-checked={selected}
+      tabIndex={0}
+      onKeyDown={e => (e.key === ' ' || e.key === 'Enter') && onClick()}
+    >
+      <div className="radio-dot">
+        <div className="radio-dot-inner" />
+      </div>
+      <div style={{ flex: 1 }}>{children}</div>
+    </div>
+  );
+}
+
+/* ─── Step 1: Identity ───────────────────────────────────────────────────── */
+function StepIdentity({ data, onChange, onNext }) {
+  const fileRef = useRef();
+  const [error, setError] = useState('');
+
+  const handleFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { setError('Please upload an image file.'); return; }
+    const url = URL.createObjectURL(file);
+    onChange({ photo: file, photoUrl: url });
+    setError('');
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      onChange({ photo: file, photoUrl: URL.createObjectURL(file) });
+      setError('');
+    }
+  };
+
+  const canProceed = data.photoUrl && data.name.trim().length >= 2;
+
+  return (
+    <div className="fade-up">
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ fontSize: 28, fontWeight: 700, color: '#fff', marginBottom: 8 }}>
+          Let's celebrate you. ✨
+        </div>
+        <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>
+          Upload your photo from today's event and tell us your name — we'll build your magazine cover.
+        </div>
+      </div>
+
+      {/* Photo Upload */}
+      <div style={{ marginBottom: 28 }}>
+        <label className="section-label" htmlFor="photo-upload">Your Event Photo</label>
+        {data.photoUrl ? (
+          <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', maxHeight: 240 }}>
+            <img src={data.photoUrl} alt="Your photo preview" style={{ width: '100%', height: 240, objectFit: 'cover', display: 'block' }} />
+            <button
+              className="btn-ghost"
+              style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+              onClick={() => { onChange({ photo: null, photoUrl: null }); fileRef.current.value = ''; }}
+            >
+              Change photo
+            </button>
+          </div>
+        ) : (
+          <div
+            className="upload-zone"
+            onClick={() => fileRef.current.click()}
+            onDrop={handleDrop}
+            onDragOver={e => e.preventDefault()}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && fileRef.current.click()}
+            aria-label="Upload your photo"
+          >
+            <div style={{ fontSize: 40, marginBottom: 12 }}>📸</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: '#fff', marginBottom: 6 }}>Drop your photo here</div>
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }}>or click to browse — JPG, PNG, WEBP</div>
+          </div>
+        )}
+        <input
+          ref={fileRef}
+          id="photo-upload"
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFile}
+        />
+        {error && <div style={{ color: '#ff6b6b', fontSize: 13, marginTop: 8 }}>{error}</div>}
+      </div>
+
+      {/* Name */}
+      <div style={{ marginBottom: 32 }}>
+        <label className="section-label" htmlFor="name-input">Your First Name</label>
+        <input
+          id="name-input"
+          className="form-input"
+          type="text"
+          value={data.name}
+          onChange={e => onChange({ name: e.target.value })}
+          placeholder="e.g. Amina"
+          maxLength={20}
+          autoComplete="given-name"
+        />
+      </div>
+
+      <button
+        className="btn-primary"
+        style={{ width: '100%' }}
+        onClick={onNext}
+        disabled={!canProceed}
+      >
+        Next: Personalize Your Cover →
+      </button>
+      {!canProceed && (
+        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginTop: 12 }}>
+          {!data.photoUrl ? 'Add your photo to continue' : 'Enter your name to continue'}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Step 2: Personalization ────────────────────────────────────────────── */
+function StepPersonalize({ data, onChange, onNext, onBack }) {
+  const canProceed = data.superpower && data.goal.trim() && data.lesson && data.sisters && data.quote.trim();
+
+  return (
+    <div className="fade-up">
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 26, fontWeight: 700, color: '#fff', marginBottom: 6 }}>
+          Your Story, Your Power
+        </div>
+        <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+          Five questions. Five answers. Your cover comes to life.
+        </div>
+      </div>
+
+      {/* Superpower */}
+      <div style={{ marginBottom: 28 }}>
+        <div className="section-label">Your AI Superpower</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {SUPERPOWERS.map(sp => (
+            <RadioCard
+              key={sp.id}
+              selected={data.superpower === sp.id}
+              onClick={() => onChange({ superpower: sp.id })}
+            >
+              <div style={{ fontWeight: 600, fontSize: 15, color: '#fff' }}>{sp.label}</div>
+              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>{sp.desc}</div>
+            </RadioCard>
+          ))}
+        </div>
+      </div>
+
+      {/* Goal */}
+      <div style={{ marginBottom: 28 }}>
+        <label className="section-label" htmlFor="goal-input">My Boldest Goal Coming Out of Today</label>
+        <input
+          id="goal-input"
+          className="form-input"
+          type="text"
+          value={data.goal}
+          onChange={e => onChange({ goal: e.target.value })}
+          placeholder="What will you build, lead, or transform?"
+          maxLength={70}
+        />
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginTop: 6, textAlign: 'right' }}>
+          {data.goal.length}/70
+        </div>
+      </div>
+
+      {/* Lesson */}
+      <div style={{ marginBottom: 28 }}>
+        <div className="section-label">The Lesson I'll Never Unlearn</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {LESSONS.map(l => (
+            <RadioCard
+              key={l.id}
+              selected={data.lesson === l.id}
+              onClick={() => onChange({ lesson: l.id })}
+            >
+              <div style={{ fontSize: 14, fontWeight: 500, color: '#fff', lineHeight: 1.4 }}>{l.text}</div>
+            </RadioCard>
+          ))}
+        </div>
+      </div>
+
+      {/* Sisters */}
+      <div style={{ marginBottom: 28 }}>
+        <label className="section-label" htmlFor="sisters-input">Sisters I Connected With Today</label>
+        <input
+          id="sisters-input"
+          className="form-input"
+          type="number"
+          min="1"
+          max="50"
+          value={data.sisters}
+          onChange={e => onChange({ sisters: e.target.value })}
+          placeholder="e.g. 4"
+        />
+      </div>
+
+      {/* Quote */}
+      <div style={{ marginBottom: 36 }}>
+        <label className="section-label" htmlFor="quote-input">A Quote That Hit Me</label>
+        <input
+          id="quote-input"
+          className="form-input"
+          type="text"
+          value={data.quote}
+          onChange={e => onChange({ quote: e.target.value })}
+          placeholder="Your moment of truth in 10 words or less"
+          maxLength={80}
+        />
+        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginTop: 6, textAlign: 'right' }}>
+          {data.quote.length}/80
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 12 }}>
+        <button className="btn-ghost" onClick={onBack} style={{ flex: '0 0 auto' }}>← Back</button>
+        <button
+          className="btn-primary"
+          style={{ flex: 1 }}
+          onClick={onNext}
+          disabled={!canProceed}
+        >
+          Generate My Cover →
+        </button>
+      </div>
+      {!canProceed && (
+        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', textAlign: 'center', marginTop: 12 }}>
+          Complete all fields above to unlock your cover
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Step 3: Share ──────────────────────────────────────────────────────── */
+function StepShare({ data, onEdit, onDownload, downloading, showCopyFeedback }) {
+  const superpowerLabel = SUPERPOWERS.find(x => x.id === data.superpower)?.label || '';
+
+  const waCaption = `My AI Superpower: ${superpowerLabel}\n\n"${data.quote}"\n\nJust discovered who I am with AI at @DadaArusha 💙\n\nNext: Dar es Salaam (June 2026)\n#DadaArushaWrapped`;
+
+  const liCaption = `Today I discovered my AI Superpower: ${superpowerLabel}.\n\n"${data.quote}"\n\nIn one morning at Dada Arusha, I went from uncertain about AI to confident, equipped, and ready. I'm walking out with skills I'll use Monday morning — and a sisterhood of women who get it.\n\nTo every ambitious woman wondering if she's behind on AI: you're not. You just need someone to show you. The next event is in Dar es Salaam this June.\n\n#DadaArushaWrapped #AI #ProfessionalDevelopment #Tanzania #WomenInTech`;
+
+  const copyText = async (text, label) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      showCopyFeedback(`${label} copied!`);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showCopyFeedback(`${label} copied!`);
+    }
+  };
+
+  return (
+    <div className="fade-up">
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontSize: 26, fontWeight: 700, color: '#fff', marginBottom: 6 }}>
+          You did that. 🎉
+        </div>
+        <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+          Your cover is ready. Download it and share your story with the world.
+        </div>
+      </div>
+
+      {/* Download */}
+      <button
+        className="btn-primary"
+        style={{ width: '100%', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}
+        onClick={onDownload}
+        disabled={downloading}
+      >
+        {downloading ? (
+          <>
+            <span className="spinner" />
+            <span>Generating high-res PNG…</span>
+          </>
+        ) : (
+          <>
+            <span>⬇</span>
+            <span>Download PNG (1080×1620)</span>
+          </>
+        )}
+      </button>
+
+      {/* Share buttons */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 28 }}>
+        <button
+          className="btn-secondary"
+          style={{ flex: 1, fontSize: 14 }}
+          onClick={() => copyText(waCaption, 'WhatsApp caption')}
+        >
+          💬 WhatsApp Caption
+        </button>
+        <button
+          className="btn-secondary"
+          style={{ flex: 1, fontSize: 14 }}
+          onClick={() => copyText(liCaption, 'LinkedIn caption')}
+        >
+          💼 LinkedIn Caption
+        </button>
+      </div>
+
+      {/* Caption previews */}
+      <div style={{ marginBottom: 20 }}>
+        <div className="section-label">WhatsApp Caption Preview</div>
+        <div style={{
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 10,
+          padding: 16,
+          fontSize: 13,
+          color: 'rgba(255,255,255,0.75)',
+          lineHeight: 1.65,
+          whiteSpace: 'pre-line',
+        }}>
+          {waCaption}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: 32 }}>
+        <div className="section-label">LinkedIn Caption Preview</div>
+        <div style={{
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 10,
+          padding: 16,
+          fontSize: 13,
+          color: 'rgba(255,255,255,0.75)',
+          lineHeight: 1.65,
+          whiteSpace: 'pre-line',
+          maxHeight: 180,
+          overflowY: 'auto',
+        }}>
+          {liCaption}
+        </div>
+      </div>
+
+      <button className="btn-ghost" style={{ width: '100%' }} onClick={onEdit}>
+        ← Edit My Cover
+      </button>
+    </div>
+  );
+}
+
+/* ─── Responsive Preview Wrapper ────────────────────────────────────────── */
+function PreviewCover({ data }) {
+  const containerRef = useRef();
+  const [scale, setScale] = useState(360 / 1080);
+
+  useEffect(() => {
+    const update = () => {
+      if (!containerRef.current) return;
+      const available = containerRef.current.parentElement?.clientWidth || 360;
+      const target = Math.min(available - 0, 360);
+      setScale(target / 1080);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const W = Math.round(1080 * scale);
+  const H = Math.round(1620 * scale);
+
+  return (
+    <div ref={containerRef} style={{ display: 'inline-block' }}>
+      <div style={{
+        boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
+        borderRadius: 6,
+        overflow: 'hidden',
+        width: W,
+        height: H,
+      }}>
+        <MagazineCover data={data} scale={scale} id="magazine-cover" />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main App ───────────────────────────────────────────────────────────── */
+function App() {
+  const [state, setState] = useState(DEFAULT_STATE);
+  const [downloading, setDownloading] = useState(false);
+  const [copyMsg, setCopyMsg] = useState('');
+  const [showCopy, setShowCopy] = useState(false);
+  const exportRef = useRef();
+
+  const update = useCallback((patch) => setState(prev => ({ ...prev, ...patch })), []);
+
+  const showCopyFeedback = (msg) => {
+    setCopyMsg(msg);
+    setShowCopy(true);
+    setTimeout(() => setShowCopy(false), 2200);
+  };
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const el = exportRef.current;
+      if (!el) return;
+
+      // Ensure fonts are loaded before capture
+      await document.fonts.ready;
+      await new Promise(r => setTimeout(r, 400));
+
+      const canvas = await html2canvas(el, {
+        scale: 1,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        backgroundColor: '#0a1628',
+        width: 1080,
+        height: 1620,
+        windowWidth: 1080,
+        windowHeight: 1620,
+        onclone: (clonedDoc) => {
+          // Ensure the cloned element is visible for capture
+          const clonedEl = clonedDoc.querySelector('#magazine-cover-export');
+          if (clonedEl) {
+            clonedEl.style.position = 'static';
+            clonedEl.style.left = '0';
+            clonedEl.style.top = '0';
+          }
+        },
+      });
+
+      const link = document.createElement('a');
+      link.download = `DadaArushaWrapped_${state.name.trim().replace(/\s+/g, '_') || 'cover'}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+      showCopyFeedback('PNG downloaded! ✓');
+    } catch (err) {
+      console.error('Download error:', err);
+      alert('Download failed — please try again. If the issue persists, try a different browser.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const stepLabels = ['Identity', 'Personalize', 'Share'];
+
+  return (
+    <div style={{ minHeight: '100vh', padding: '0 0 60px' }}>
+      {/* Header */}
+      <div className="header-inner" style={{
+        background: 'rgba(255,255,255,0.03)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        padding: '18px 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backdropFilter: 'blur(12px)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+      }}>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', letterSpacing: '0.5px' }}>
+            Dada Arusha Wrapped
+          </div>
+          <div style={{ fontSize: 12, color: '#1D9E75', fontWeight: 500, letterSpacing: '1px' }}>
+            MAY 1ST 2026 · ARUSHA, TANZANIA
+          </div>
+        </div>
+        {/* Step indicators */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {[1, 2, 3].map(n => (
+            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div
+                className={`step-dot ${state.step === n ? 'active' : state.step > n ? 'done' : ''}`}
+                title={stepLabels[n - 1]}
+              />
+              <span style={{
+                fontSize: 12,
+                fontWeight: 500,
+                color: state.step >= n ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.3)',
+                display: window.innerWidth > 480 ? 'block' : 'none',
+              }}>
+                {stepLabels[n - 1]}
+              </span>
+              {n < 3 && <div style={{ width: 20, height: 1, background: state.step > n ? '#1D9E75' : 'rgba(255,255,255,0.15)' }} />}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Body */}
+      <div
+        className="app-layout"
+        style={{
+          display: 'flex',
+          gap: 40,
+          maxWidth: 1200,
+          margin: '0 auto',
+          padding: '40px 32px 0',
+          alignItems: 'flex-start',
+        }}
+      >
+        {/* Left: Form */}
+        <div style={{ flex: '1 1 480px', maxWidth: 560 }}>
+          {state.step === 1 && (
+            <StepIdentity
+              data={state}
+              onChange={update}
+              onNext={() => update({ step: 2 })}
+            />
+          )}
+          {state.step === 2 && (
+            <StepPersonalize
+              data={state}
+              onChange={update}
+              onNext={() => update({ step: 3 })}
+              onBack={() => update({ step: 1 })}
+            />
+          )}
+          {state.step === 3 && (
+            <StepShare
+              data={state}
+              onEdit={() => update({ step: 2 })}
+              onDownload={handleDownload}
+              downloading={downloading}
+              showCopyFeedback={showCopyFeedback}
+            />
+          )}
+        </div>
+
+        {/* Right: Preview */}
+        <div
+          className="preview-panel"
+          style={{
+            flex: '0 0 auto',
+            position: 'sticky',
+            top: 90,
+          }}
+        >
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: '2px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+              LIVE PREVIEW
+            </div>
+          </div>
+          <PreviewCover data={state} />
+          {!state.photoUrl && (
+            <div style={{ marginTop: 14, fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', maxWidth: 360 }}>
+              Upload your photo to see the full cover
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Hidden high-res export cover */}
+      <div
+        ref={exportRef}
+        style={{
+          position: 'fixed',
+          left: '-9999px',
+          top: '-9999px',
+          width: 1080,
+          height: 1620,
+          overflow: 'hidden',
+        }}
+      >
+        <MagazineCover data={state} scale={1} id="magazine-cover-export" />
+      </div>
+
+      {/* Copy feedback toast */}
+      <div className={`copy-feedback ${showCopy ? 'show' : ''}`}>
+        {copyMsg}
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
